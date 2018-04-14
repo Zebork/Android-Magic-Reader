@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.zebork.magic.magicreader.dummy.InfoGetter;
+//import org.zebork.magic.magicreader.dummy.InfoGetter;
 /**
  * Helper class for providing sample content for user interfaces created by
  * Android template wizards.
@@ -35,6 +35,9 @@ public class DummyContent {
         String sysInfo = infoGetter.getSystemInfo();
         DummyItem system = new DummyItem("1", "System Info", sysInfo);
         addItem(system);
+        String cpuInfo = infoGetter.getCpuInfo();
+        DummyItem cpu = new DummyItem("2", "CPU Info", cpuInfo);
+        addItem(cpu);
 
     }
 
