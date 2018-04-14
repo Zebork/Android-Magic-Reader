@@ -1,12 +1,13 @@
 package org.zebork.magic.magicreader.dummy;
 
 import android.os.Build;
-import android.app.Activity;
 import java.io.InputStream;
 import java.io.IOException;
 
-public class InfoGetter extends Activity {
 
+public class InfoGetter {
+
+    private boolean isAc = false;
 
     public String getSystemInfo() {
         String model = "手机型号: " + Build.MODEL;
@@ -19,17 +20,11 @@ public class InfoGetter extends Activity {
         }
         String company = "系统定制商: " + Build.BRAND;
         String device = "系统参数:" + Build.DEVICE;
-
-//        try {
-//            TelephonyManager telephonyManager = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
-//            String imei = "IMEI: " + telephonyManager.getDeviceId();
-//            return model + "\n" + api_builder.toString() + "\n" + company + "\n" + device + "\n" + imei;
-//        } catch(SecurityException e){
-//
-//        }
         return model + "\n" + api_builder.toString() + "\n" + company + "\n" + device + "\n";
 
     }
+
+
 
     public static String getCpuInfo() {
         String result = "";
@@ -51,4 +46,5 @@ public class InfoGetter extends Activity {
         }
         return result.trim();
     }
+
 }

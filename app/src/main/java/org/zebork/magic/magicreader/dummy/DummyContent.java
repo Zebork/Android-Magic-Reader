@@ -39,12 +39,20 @@ public class DummyContent {
         DummyItem cpu = new DummyItem("2", "CPU Info", cpuInfo);
         addItem(cpu);
 
+        String memoryInfo = "Before Init";
+        DummyItem mem = new DummyItem("3", "Memory Info", memoryInfo);
+        addItem(mem);
+
     }
 
     private static void addItem(DummyItem item) {
         ITEMS.add(item);
         ITEM_MAP.put(item.id, item);
     }
+
+//    public static DummyItem getItem(String id) {
+//        return ITEM_MAP.get(id);
+//    }
 
     private static DummyItem createDummyItem(int position) {
         return new DummyItem(String.valueOf(position), "Item " + position, makeDetails(position));
@@ -65,7 +73,7 @@ public class DummyContent {
     public static class DummyItem {
         public final String id;
         public final String content;
-        public final String details;
+        public String details;
 
         public DummyItem(String id, String content, String details) {
             this.id = id;
