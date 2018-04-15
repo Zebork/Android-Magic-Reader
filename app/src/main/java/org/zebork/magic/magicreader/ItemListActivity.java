@@ -4,8 +4,6 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.net.wifi.WifiInfo;
-import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -14,7 +12,6 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.telephony.TelephonyManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -49,7 +46,6 @@ public class ItemListActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        DummyContent.ITEM_MAP.get("1").setDynamic(InfoGetter.getMacAddress(this));
         final ActivityManager activityManager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
         ActivityManager.MemoryInfo info = new ActivityManager.MemoryInfo();
         activityManager.getMemoryInfo(info);
@@ -89,6 +85,9 @@ public class ItemListActivity extends AppCompatActivity {
                 Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this,
                     new String[] {Manifest.permission.READ_PHONE_STATE}, 1);
+        } else {
+            DummyContent.ITEM_MAP.get("1").setDynamic(InfoGetter.getMacAddress(this)
+                    + InfoGetter.getInfo(this));
         }
     }
 
@@ -102,6 +101,7 @@ public class ItemListActivity extends AppCompatActivity {
                             + InfoGetter.getInfo(this));
                 } else {
                     Toast.makeText(this, "权限拒绝！", Toast.LENGTH_SHORT).show();
+                    DummyContent.ITEM_MAP.get("1").setDynamic(InfoGetter.getMacAddress(this));
                 }
                 break;
             default:
