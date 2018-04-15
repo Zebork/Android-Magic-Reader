@@ -1,8 +1,14 @@
 package org.zebork.magic.magicreader.dummy;
 
+import android.content.Context;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.Build;
+import android.telephony.TelephonyManager;
+
 import java.io.InputStream;
 import java.io.IOException;
+
 
 
 public class InfoGetter {
@@ -20,11 +26,43 @@ public class InfoGetter {
         }
         String company = "系统定制商: " + Build.BRAND;
         String device = "系统参数:" + Build.DEVICE;
+
         return model + "\n" + api_builder.toString() + "\n" + company + "\n" + device + "\n";
 
     }
 
 
+    /**
+     * 获取IMEI号，IESI号，手机型号
+     */
+    public static String getInfo(Context ctx) {
+        String imi = null;
+        try {
+            TelephonyManager mTm = (TelephonyManager) ctx.getSystemService(ctx.TELEPHONY_SERVICE);
+            String imei = mTm.getDeviceId();
+            String imsi = mTm.getSubscriberId();
+            String mtype = android.os.Build.MODEL; // 手机型号
+            String mtyb = android.os.Build.BRAND;//手机品牌
+            String numer = mTm.getLine1Number(); // 手机号码，有的可得，有的不可得
+            imi = "手机IMEI号：" + imei + "\n手机IESI号：" + imsi + "\n手机型号：" + mtype + "\n手机品牌：" + mtyb + "\n手机号码：" + numer + "\n";
+        } catch (SecurityException e) {
+            imi = "";
+        }
+
+        return imi + "\n";
+    }
+
+    /**
+     * 获取MAC地址（需要wifi权限）
+     * @return MacAddr
+     */
+    public static String getMacAddress(Context ctx){
+        String macAddr = "";
+        WifiManager wifiManager = (WifiManager) ctx.getSystemService(ctx.WIFI_SERVICE);
+        WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+        macAddr = wifiInfo.getMacAddress();
+        return "手机macAdd: " + macAddr + "\n";
+    }
 
     public static String getCpuInfo() {
         String result = "";
