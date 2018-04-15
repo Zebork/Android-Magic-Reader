@@ -23,6 +23,7 @@ import android.app.ActivityManager;
 import android.widget.Toast;
 
 import org.zebork.magic.magicreader.dummy.DummyContent;
+import org.zebork.magic.magicreader.dummy.InfoGetter;
 
 
 import java.util.List;
@@ -48,6 +49,7 @@ public class ItemListActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        DummyContent.ITEM_MAP.get("1").setDynamic(InfoGetter.getMacAddress(this));
         final ActivityManager activityManager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
         ActivityManager.MemoryInfo info = new ActivityManager.MemoryInfo();
         activityManager.getMemoryInfo(info);
@@ -83,17 +85,21 @@ public class ItemListActivity extends AppCompatActivity {
         assert recyclerView != null;
         setupRecyclerView((RecyclerView) recyclerView);
 
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.READ_PHONE_STATE}, 1);
+        if (ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[] {Manifest.permission.READ_PHONE_STATE}, 1);
         }
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
         switch (requestCode) {
             case 1:
                 if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    DummyContent.ITEM_MAP.get("1").details += getInfo();
+                    DummyContent.ITEM_MAP.get("1").setDynamic(InfoGetter.getMacAddress(this)
+                            + InfoGetter.getInfo(this));
                 } else {
                     Toast.makeText(this, "权限拒绝！", Toast.LENGTH_SHORT).show();
                 }
@@ -102,41 +108,6 @@ public class ItemListActivity extends AppCompatActivity {
         }
     }
 
-    /**
-     * 获取IMEI号，IESI号，手机型号
-     */
-    private String getInfo() {
-        String imi = null;
-        try {
-            TelephonyManager mTm = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
-            String imei = mTm.getDeviceId();
-            String imsi = mTm.getSubscriberId();
-            String mtype = android.os.Build.MODEL; // 手机型号
-            String mtyb = android.os.Build.BRAND;//手机品牌
-            String numer = mTm.getLine1Number(); // 手机号码，有的可得，有的不可得
-            imi = "手机IMEI号：" + imei + "\n手机IESI号：" + imsi + "\n手机型号：" + mtype + "\n手机品牌：" + mtyb + "\n手机号码" + numer + "\n";
-        } catch (SecurityException e) {
-            imi = "";
-        }
-        String macAddr = "";
-        WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-        WifiInfo wifiInfo = wifiManager.getConnectionInfo();
-        macAddr = "手机macAdd:" + wifiInfo.getMacAddress();
-
-        return imi + macAddr + "\n";
-    }
-
-    /**
-     * 获取手机MAC地址
-     * 只有手机开启wifi才能获取到mac地址
-
-    private String getMacAddress(){
-        String macAddr = "";
-        WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-        WifiInfo wifiInfo = wifiManager.getConnectionInfo();
-        macAddr = wifiInfo.getMacAddress();
-        return "手机macAdd:" + macAddr;
-    }*/
 
 
     private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
