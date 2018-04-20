@@ -49,7 +49,7 @@ public class InfoGetter {
             FileReader fr = new FileReader("/sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq");
             BufferedReader br = new BufferedReader(fr);
             String text = br.readLine();
-            curFreqCPU = "CPU当前频率" + text.trim() + "KHz\n";
+            curFreqCPU = "CPU当前频率：" + text.trim() + "KHz\n";
             br.close();
             fr.close();
         } catch (FileNotFoundException e) {
@@ -63,7 +63,7 @@ public class InfoGetter {
             FileReader fr = new FileReader("/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq");
             BufferedReader br = new BufferedReader(fr);
             String text = br.readLine();
-            maxFreqCPU = "CPU最大频率" + text.trim() + "KHz\n";
+            maxFreqCPU = "CPU最大频率：" + text.trim() + "KHz\n";
             br.close();
             fr.close();
         } catch (FileNotFoundException e) {
@@ -74,17 +74,15 @@ public class InfoGetter {
             maxFreqCPU = "";
         }
 
-        String company = "系统定制商: " + Build.BRAND;
+        String company = "系统品牌: " + Build.BRAND;
         String device = "系统参数:" + Build.DEVICE;
 
         // 其他参数太多，不一一使用变量了，一个string得了
         //BOARD 主板
         String phoneInfo = "主板: " + Build.BOARD;
         phoneInfo += "\nBOOTLOADER: " + Build.BOOTLOADER;
-        //DEVICE 驱动
-        phoneInfo += "\nDEVICE: " + Build.DEVICE;
         //DISPLAY Rom的名字 例如 Flyme 1.1.2（魅族rom） &nbsp;JWR66V（Android nexus系列原生4.3rom）
-        phoneInfo += "\nDISPLAY: " + Build.DISPLAY;
+        phoneInfo += "\nRom版本: " + Build.DISPLAY;
         //指纹
         phoneInfo += "\n指纹: " + Build.FINGERPRINT;
         //HARDWARE 硬件
@@ -124,8 +122,6 @@ public class InfoGetter {
             TelephonyManager mTm = (TelephonyManager) ctx.getSystemService(ctx.TELEPHONY_SERVICE);
             String imei = mTm.getDeviceId();
             String imsi = mTm.getSubscriberId();
-            String mtype = android.os.Build.MODEL;      // 手机型号
-            String mtyb = android.os.Build.BRAND;       // 手机品牌
             String numer = mTm.getLine1Number();        // 手机号码，有的可得，有的不可得
             String sim = mTm.getSimSerialNumber();      // SIM卡的ICCID
             String imsi_o = mTm.getSubscriberId();        // 运营商
@@ -140,9 +136,8 @@ public class InfoGetter {
                 } else
                     imsi_o = imsi_o.substring(0, 5);
             }
-            imi = "手机IMEI号：" + imei + "\n手机IESI号：" + imsi + "\n手机型号：" + mtype
-                    + "\n手机品牌：" + mtyb + "\n手机号码：" + numer + "\nSIM ICCID：" + sim
-                    + "\n运营商：" + imsi_o;
+            imi = "手机IMEI号：" + imei + "\n手机IESI号：" + imsi + "\n手机号码：" + numer
+                    + "\nSIM ICCID：" + sim + "\n运营商：" + imsi_o;
         } catch (SecurityException e) {
             imi = "";
         }
@@ -251,10 +246,12 @@ public class InfoGetter {
                 new ApplicationInfo.DisplayNameComparator(pm));// 字典排序
         for (ApplicationInfo app : listAppcations) {
             if ((app.flags & ApplicationInfo.FLAG_SYSTEM) <= 0) {//非系统程序
-                appInfos.add(getAppInfo(app, pm));
+                appInfos.add(getAppInfo(app, pm, -2));
             }//本来是系统程序，被用户手动更新后，该系统程序也成为第三方应用程序了
             else if ((app.flags & ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) != 0) {
-                appInfos.add(getAppInfo(app, pm));
+                appInfos.add(getAppInfo(app, pm, -1));
+            } else { // 系统应用
+                appInfos.add(getAppInfo(app, pm, 1));
             }
         }
         return appInfos;
@@ -263,11 +260,15 @@ public class InfoGetter {
     /**
      *  构造一个AppInfo对象 ，并赋值
      */
-    private static APPInfo getAppInfo(ApplicationInfo app, PackageManager pm) {
+    private static APPInfo getAppInfo(ApplicationInfo app, PackageManager pm, int flag) {
         APPInfo appInfo = new APPInfo();
-        appInfo.setAppLabel(pm.getApplicationLabel(app).toString());//应用名称
-        appInfo.setAppIcon(app.loadIcon(pm));//应用icon
-        appInfo.setPkgName(app.packageName);//应用包名，用来卸载
+        appInfo.setAppLabel(pm.getApplicationLabel(app).toString());    // 应用名称
+        appInfo.setAppIcon(app.loadIcon(pm));   // 应用icon
+        appInfo.setPkgName(app.packageName);    // 应用包名，用来卸载
+        appInfo.setFlag(flag);                  // 是否系统应用标记
+        if ((app.flags & ApplicationInfo.FLAG_EXTERNAL_STORAGE) != 0) {
+            appInfo.setInSDCard(true);
+        }
         File file = new File(app.sourceDir);
         float size = file.length();
         DecimalFormat df = new DecimalFormat("#.00");

@@ -56,12 +56,23 @@ public class ItemListActivity extends AppCompatActivity {
         DummyContent.ITEM_MAP.get("3").details = avail + "\n" + total;
 
         StringBuilder installedApp = new StringBuilder();
-        installedApp.append("APP\tSize\tUpdateDate\n");
+        //installedApp.append("APP\tSize\tUpdateDate\n");
         List<APPInfo> appInfos = InfoGetter.getInstallApp(this);
+        int isSysApp = 0;
         for(APPInfo app : appInfos) {
-            installedApp.append(app.getAppLabel() + "\t" + app.getAppSize() + "\t" + app.getUpdateDate() + "\n");
+            installedApp.append("APP\t" + app.getAppLabel() + "\n"
+                    + "大小\t" + app.getAppSize() + "\n"
+                    + "系统应用\t" + app.getFlag() + "\n"
+                    + "安装位置\t" + app.isInSDCard() + "\n"
+                    + "更新时间\t" + app.getUpdateDate() + "\n"
+                    + "packet\t" + app.getPkgName() + "\n\n"
+            );
+            if (app.getFlag() == "True")
+                isSysApp += 1;
         }
-        DummyContent.ITEM_MAP.get("4").setDynamic(installedApp.toString());
+        DummyContent.ITEM_MAP.get("4").setDynamic("共" + appInfos.size() + "个应用, 其中" + isSysApp
+                + "个系统应用，" + (appInfos.size() - isSysApp) + "个第三方应用。\n\n"
+                + installedApp.toString());
 
         setContentView(R.layout.activity_item_list);
 

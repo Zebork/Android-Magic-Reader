@@ -16,10 +16,23 @@ public class APPInfo {
     private String appSize;
     //更新时间
     private long updateDate;
+    /**
+     * 系统应用标记
+     * -2 非系统应用
+     * -1 系统应用升级后成为第三方应用
+     * 1 系统应用
+     */
+    private int flag;
+    /**
+     * 安装位置
+     * True 在SD卡上
+     * False 不在SD卡上
+     */
+    private boolean inSDCard;
 
     //构造方法
     public APPInfo(){
-
+        inSDCard = false;
     }
 
     public String getAppLabel() {
@@ -62,5 +75,25 @@ public class APPInfo {
 
     public void setUpdateDate(long updateDate) {
         this.updateDate = updateDate;
+    }
+
+    public String getFlag() {
+        if (flag > 0)
+            return "True";
+        return "False";
+    }
+
+    public void setFlag(int flag) {
+        this.flag = flag;
+    }
+
+    public String isInSDCard() {
+        if (inSDCard)
+            return "SD Card";
+        return "System Default";
+    }
+
+    public void setInSDCard(boolean inSDCard) {
+        this.inSDCard = inSDCard;
     }
 }
