@@ -43,6 +43,9 @@ public class DummyContent {
         DummyItem mem = new DummyItem("3", "Memory Info", memoryInfo);
         addItem(mem);
 
+        String appInfo = "";
+        DummyItem app = new DummyItem("4", "APP Info", appInfo);
+        addItem(app);
     }
 
     private static void addItem(DummyItem item) {

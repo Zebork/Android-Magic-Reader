@@ -19,6 +19,7 @@ import android.widget.TextView;
 import android.app.ActivityManager;
 import android.widget.Toast;
 
+import org.zebork.magic.magicreader.dummy.APPInfo;
 import org.zebork.magic.magicreader.dummy.DummyContent;
 import org.zebork.magic.magicreader.dummy.InfoGetter;
 
@@ -54,6 +55,14 @@ public class ItemListActivity extends AppCompatActivity {
 
         DummyContent.ITEM_MAP.get("3").details = avail + "\n" + total;
 
+        StringBuilder installedApp = new StringBuilder();
+        installedApp.append("APP\tSize\tUpdateDate\n");
+        List<APPInfo> appInfos = InfoGetter.getInstallApp(this);
+        for(APPInfo app : appInfos) {
+            installedApp.append(app.getAppLabel() + "\t" + app.getAppSize() + "\t" + app.getUpdateDate() + "\n");
+        }
+        DummyContent.ITEM_MAP.get("4").setDynamic(installedApp.toString());
+
         setContentView(R.layout.activity_item_list);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -87,7 +96,15 @@ public class ItemListActivity extends AppCompatActivity {
                     new String[] {Manifest.permission.READ_PHONE_STATE}, 1);
         } else {
             DummyContent.ITEM_MAP.get("1").setDynamic(InfoGetter.getMacAddress(this)
-                    + InfoGetter.getInfo(this));
+                    + InfoGetter.getInfo(this) + InfoGetter.getNetworkInfo(this));
+        }
+        if (ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_NETWORK_STATE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[] {Manifest.permission.ACCESS_NETWORK_STATE}, 2);
+        } else {
+            DummyContent.ITEM_MAP.get("1").setDynamic(InfoGetter.getMacAddress(this)
+                    + InfoGetter.getInfo(this) + InfoGetter.getNetworkInfo(this));
         }
     }
 
@@ -98,7 +115,16 @@ public class ItemListActivity extends AppCompatActivity {
             case 1:
                 if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     DummyContent.ITEM_MAP.get("1").setDynamic(InfoGetter.getMacAddress(this)
-                            + InfoGetter.getInfo(this));
+                            + InfoGetter.getInfo(this) + InfoGetter.getNetworkInfo(this));
+                } else {
+                    Toast.makeText(this, "权限拒绝！", Toast.LENGTH_SHORT).show();
+                    DummyContent.ITEM_MAP.get("1").setDynamic(InfoGetter.getMacAddress(this));
+                }
+                break;
+            case 2:
+                if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    DummyContent.ITEM_MAP.get("1").setDynamic(InfoGetter.getMacAddress(this)
+                            + InfoGetter.getInfo(this) + InfoGetter.getNetworkInfo(this));
                 } else {
                     Toast.makeText(this, "权限拒绝！", Toast.LENGTH_SHORT).show();
                     DummyContent.ITEM_MAP.get("1").setDynamic(InfoGetter.getMacAddress(this));
