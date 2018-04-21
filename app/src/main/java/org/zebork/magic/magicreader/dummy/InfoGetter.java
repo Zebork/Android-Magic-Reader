@@ -116,7 +116,7 @@ public class InfoGetter {
     /**
      * 获取IMEI号，IESI号，手机型号
      */
-    public static String getInfo(Context ctx) {
+    public static String getPhoneInfo(Context ctx) {
         String imi = null;
         try {
             TelephonyManager mTm = (TelephonyManager) ctx.getSystemService(ctx.TELEPHONY_SERVICE);
@@ -282,6 +282,15 @@ public class InfoGetter {
             e.printStackTrace();
         }
         return appInfo;
+    }
+
+    /**
+     * 获取位置信息
+     */
+    public static String getLocationInfo(Context ctx) {
+        LocationInfo locationInfo = new LocationInfo(ctx);
+        String location = locationInfo.getDetailedLocation();
+        return location;
     }
 
     /*

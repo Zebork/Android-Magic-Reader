@@ -7,6 +7,7 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -22,8 +23,10 @@ import android.widget.Toast;
 import org.zebork.magic.magicreader.dummy.APPInfo;
 import org.zebork.magic.magicreader.dummy.DummyContent;
 import org.zebork.magic.magicreader.dummy.InfoGetter;
+import org.zebork.magic.magicreader.dummy.LocationInfo;
 
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -42,6 +45,14 @@ public class ItemListActivity extends AppCompatActivity {
      * device.
      */
     private boolean mTwoPane;
+
+    String[] permissions = new String[]{
+            Manifest.permission.READ_PHONE_STATE,
+            Manifest.permission.ACCESS_NETWORK_STATE,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+    };
+    // 声明一个集合，在后面的代码中用来存储用户拒绝授权的权
+    List<String> mPermissionList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,51 +112,50 @@ public class ItemListActivity extends AppCompatActivity {
         assert recyclerView != null;
         setupRecyclerView((RecyclerView) recyclerView);
 
-        if (ActivityCompat.checkSelfPermission(this,
-                Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this,
-                    new String[] {Manifest.permission.READ_PHONE_STATE}, 1);
-        } else {
-            DummyContent.ITEM_MAP.get("1").setDynamic(InfoGetter.getMacAddress(this)
-                    + InfoGetter.getInfo(this) + InfoGetter.getNetworkInfo(this));
+        mPermissionList.clear();
+        for (int i = 0; i < permissions.length; i++) {
+            if (ContextCompat.checkSelfPermission(this, permissions[i]) != PackageManager.PERMISSION_GRANTED) {
+                mPermissionList.add(permissions[i]);
+            }
         }
-        if (ActivityCompat.checkSelfPermission(this,
-                Manifest.permission.ACCESS_NETWORK_STATE) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this,
-                    new String[] {Manifest.permission.ACCESS_NETWORK_STATE}, 2);
-        } else {
-            DummyContent.ITEM_MAP.get("1").setDynamic(InfoGetter.getMacAddress(this)
-                    + InfoGetter.getInfo(this) + InfoGetter.getNetworkInfo(this));
+        if (mPermissionList.isEmpty()) {//未授予的权限为空，表示都授予了
+            //Toast.makeText(this,"已经授权",Toast.LENGTH_LONG).show();
+        } else {//请求权限方法
+            String[] permissions = mPermissionList.toArray(new String[mPermissionList.size()]);//将List转为数组
+            ActivityCompat.requestPermissions(this, permissions, 1);
         }
+        try {
+            DummyContent.ITEM_MAP.get("1").setDynamic(InfoGetter.getMacAddress(this)
+                    + InfoGetter.getPhoneInfo(this) + InfoGetter.getNetworkInfo(this)
+                    + InfoGetter.getLocationInfo(this));
+        } catch (Exception e) {
+            throw e;
+        }
+
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
-        switch (requestCode) {
-            case 1:
-                if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    DummyContent.ITEM_MAP.get("1").setDynamic(InfoGetter.getMacAddress(this)
-                            + InfoGetter.getInfo(this) + InfoGetter.getNetworkInfo(this));
-                } else {
-                    Toast.makeText(this, "权限拒绝！", Toast.LENGTH_SHORT).show();
-                    DummyContent.ITEM_MAP.get("1").setDynamic(InfoGetter.getMacAddress(this));
+        for (int i = 0; i < grantResults.length; i++) {
+            if (grantResults[i] != PackageManager.PERMISSION_GRANTED) {
+                //判断是否勾选禁止后不再询问
+                boolean showRequestPermission = ActivityCompat.shouldShowRequestPermissionRationale(this, permissions[i]);
+                if (showRequestPermission) {
+                    Toast.makeText(this, "权限获取失败！", Toast.LENGTH_SHORT).show();
+
                 }
-                break;
-            case 2:
-                if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    DummyContent.ITEM_MAP.get("1").setDynamic(InfoGetter.getMacAddress(this)
-                            + InfoGetter.getInfo(this) + InfoGetter.getNetworkInfo(this));
-                } else {
-                    Toast.makeText(this, "权限拒绝！", Toast.LENGTH_SHORT).show();
-                    DummyContent.ITEM_MAP.get("1").setDynamic(InfoGetter.getMacAddress(this));
-                }
-                break;
-            default:
+            }
         }
+        try {
+            DummyContent.ITEM_MAP.get("1").setDynamic(InfoGetter.getMacAddress(this)
+                    + InfoGetter.getPhoneInfo(this) + InfoGetter.getNetworkInfo(this)
+                    + InfoGetter.getLocationInfo(this));
+        } catch (Exception e) {
+            throw e;
+        }
+
     }
-
-
 
     private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
         recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(this, DummyContent.ITEMS, mTwoPane));
