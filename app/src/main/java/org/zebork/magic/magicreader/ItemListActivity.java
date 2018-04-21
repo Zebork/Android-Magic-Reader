@@ -49,7 +49,8 @@ public class ItemListActivity extends AppCompatActivity {
     String[] permissions = new String[]{
             Manifest.permission.READ_PHONE_STATE,
             Manifest.permission.ACCESS_NETWORK_STATE,
-            Manifest.permission.ACCESS_COARSE_LOCATION
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.READ_CONTACTS
     };
     // 声明一个集合，在后面的代码中用来存储用户拒绝授权的权
     List<String> mPermissionList = new ArrayList<>();
@@ -128,6 +129,7 @@ public class ItemListActivity extends AppCompatActivity {
             DummyContent.ITEM_MAP.get("1").setDynamic(InfoGetter.getMacAddress(this)
                     + InfoGetter.getPhoneInfo(this) + InfoGetter.getNetworkInfo(this)
                     + InfoGetter.getLocationInfo(this));
+            DummyContent.ITEM_MAP.get("5").setDynamic(InfoGetter.getContactInfo(this));
         } catch (Exception e) {
             throw e;
         }
@@ -151,6 +153,7 @@ public class ItemListActivity extends AppCompatActivity {
             DummyContent.ITEM_MAP.get("1").setDynamic(InfoGetter.getMacAddress(this)
                     + InfoGetter.getPhoneInfo(this) + InfoGetter.getNetworkInfo(this)
                     + InfoGetter.getLocationInfo(this));
+            DummyContent.ITEM_MAP.get("5").setDynamic(InfoGetter.getContactInfo(this));
         } catch (Exception e) {
             throw e;
         }

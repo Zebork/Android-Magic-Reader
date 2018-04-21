@@ -14,6 +14,9 @@ import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -292,6 +295,31 @@ public class InfoGetter {
         String location = locationInfo.getDetailedLocation();
         return location;
     }
+
+    /**
+     * 获取联系人信息
+     */
+    public static String getContactInfo(Context ctx) {
+        ContactInfo contactInfo = new ContactInfo(ctx);
+        String contact = null;
+        try {
+            contact = contactInfo.getContactInfo();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return contact;
+    }
+
+    /**
+     * json 2 string
+     *
+     * @param jsonObject 联系人json信息
+     * @return string 提取一丢丢出来
+
+    public String json2String(JSONObject jsonObject) {
+
+
+    }*/
 
     /*
     // 读指定路径的文件

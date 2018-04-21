@@ -46,6 +46,10 @@ public class DummyContent {
         String appInfo = "";
         DummyItem app = new DummyItem("4", "APP Info", appInfo);
         addItem(app);
+
+        String contactInfo = "";
+        DummyItem contact = new DummyItem("5", "Contact Info", contactInfo);
+        addItem(contact);
     }
 
     private static void addItem(DummyItem item) {
