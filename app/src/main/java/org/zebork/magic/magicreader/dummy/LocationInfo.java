@@ -7,6 +7,7 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
 import android.support.v4.content.ContextCompat;
+import android.widget.Toast;
 
 import java.io.IOException;
 import java.util.List;
@@ -99,6 +100,7 @@ public class LocationInfo {
                 for (int i = 0; i < address.getMaxAddressLineIndex(); i++) {
                     stringBuilder.append(address.getAddressLine(i)).append("\n");
                 }
+                stringBuilder.append("详细地理信息：\n");
                 stringBuilder.append(address.getCountryName()).append("_");//国家
                 stringBuilder.append(address.getFeatureName()).append("_");//周边地址
                 stringBuilder.append(address.getLocality()).append("_");//市
@@ -115,6 +117,8 @@ public class LocationInfo {
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
+            Toast.makeText(context, "请检查网络或GPS是否打开", Toast.LENGTH_SHORT).show();
+            return "";
         }
         return stringBuilder.toString();
     }
