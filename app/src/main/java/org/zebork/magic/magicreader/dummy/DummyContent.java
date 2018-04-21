@@ -50,6 +50,10 @@ public class DummyContent {
         String contactInfo = "";
         DummyItem contact = new DummyItem("5", "Contact Info", contactInfo);
         addItem(contact);
+
+        String smsInfo = "";
+        DummyItem sms = new DummyItem("6", "SMS Info", smsInfo);
+        addItem(sms);
     }
 
     private static void addItem(DummyItem item) {

