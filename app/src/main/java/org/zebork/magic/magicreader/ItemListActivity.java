@@ -73,14 +73,8 @@ public class ItemListActivity extends AppCompatActivity {
         List<APPInfo> appInfos = InfoGetter.getInstallApp(this);
         int isSysApp = 0;
         for(APPInfo app : appInfos) {
-            installedApp.append("APP\t" + app.getAppLabel() + "\n"
-                    + "大小\t" + app.getAppSize() + "\n"
-                    + "系统应用\t" + app.getFlag() + "\n"
-                    + "安装位置\t" + app.isInSDCard() + "\n"
-                    + "更新时间\t" + app.getUpdateDate() + "\n"
-                    + "packet\t" + app.getPkgName() + "\n\n"
-            );
-            if (app.getFlag() == "True")
+            installedApp.append(app.getAppInfo());
+            if (app.getFlag().equals("True"))
                 isSysApp += 1;
         }
         DummyContent.ITEM_MAP.get("4").setDynamic("共" + appInfos.size() + "个应用, 其中" + isSysApp

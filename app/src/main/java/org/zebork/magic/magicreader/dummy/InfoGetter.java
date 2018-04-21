@@ -239,7 +239,7 @@ public class InfoGetter {
     }
 
     /**
-     * 获取已安装非系统应用
+     * 获取已安装应用
      *
      * @return
      */
@@ -270,20 +270,23 @@ public class InfoGetter {
         APPInfo appInfo = new APPInfo();
         appInfo.setAppLabel(pm.getApplicationLabel(app).toString());    // 应用名称
         appInfo.setAppIcon(app.loadIcon(pm));   // 应用icon
-        appInfo.setPkgName(app.packageName);    // 应用包名，用来卸载
+        appInfo.setPkgName(app.packageName);    // 应用包名
         appInfo.setFlag(flag);                  // 是否系统应用标记
+//        appInfo.setProcess(app.processName);
         if ((app.flags & ApplicationInfo.FLAG_EXTERNAL_STORAGE) != 0) {
             appInfo.setInSDCard(true);
         }
         File file = new File(app.sourceDir);
         float size = file.length();
         DecimalFormat df = new DecimalFormat("#.00");
-        appInfo.setAppSize(df.format(size / (1024 * 1024)) + "M");//应用大小，M单位，保留两位小数
+        appInfo.setAppSize(df.format(size / (1024 * 1024)) + "M");  // 应用大小，M单位，保留两位小数
         PackageInfo packageInfo = null;
         try {
             packageInfo = pm.getPackageInfo(app.packageName, 0);
-            long lastUpdateTime = packageInfo.lastUpdateTime;//应用最近一次更新时间
-            appInfo.setUpdateDate(lastUpdateTime);//将毫秒时间对比当前时间转换为多久以前
+            long lastUpdateTime = packageInfo.lastUpdateTime;   // 应用最近一次更新时间
+            appInfo.setUpdateDate(lastUpdateTime);              // 将毫秒时间对比当前时间转换为多久以前
+            appInfo.setAppVersion(packageInfo.versionName);
+//            appInfo.setPermissions(packageInfo.requestedPermissions);
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
