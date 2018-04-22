@@ -43,6 +43,17 @@ public class DummyContent {
         DummyItem mem = new DummyItem("3", "Memory Info", memoryInfo);
         addItem(mem);
 
+        String appInfo = "";
+        DummyItem app = new DummyItem("4", "APP Info", appInfo);
+        addItem(app);
+
+        String contactInfo = "";
+        DummyItem contact = new DummyItem("5", "Contact Info", contactInfo);
+        addItem(contact);
+
+        String smsInfo = "";
+        DummyItem sms = new DummyItem("6", "SMS Info", smsInfo);
+        addItem(sms);
     }
 
     private static void addItem(DummyItem item) {
@@ -74,11 +85,20 @@ public class DummyContent {
         public final String id;
         public final String content;
         public String details;
+        private String dynamic = "";
 
         public DummyItem(String id, String content, String details) {
             this.id = id;
             this.content = content;
             this.details = details;
+        }
+
+        public void setDynamic(String dynamic) {
+            this.dynamic = dynamic;
+        }
+
+        public String getDynamic() {
+            return dynamic;
         }
 
         @Override

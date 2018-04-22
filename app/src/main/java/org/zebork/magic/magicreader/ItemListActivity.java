@@ -1,9 +1,13 @@
 package org.zebork.magic.magicreader;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -14,10 +18,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import android.app.ActivityManager;
+import android.widget.Toast;
 
+import org.zebork.magic.magicreader.dummy.APPInfo;
 import org.zebork.magic.magicreader.dummy.DummyContent;
+import org.zebork.magic.magicreader.dummy.InfoGetter;
+import org.zebork.magic.magicreader.dummy.LocationInfo;
 
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -27,6 +36,7 @@ import java.util.List;
  * lead to a {@link ItemDetailActivity} representing
  * item details. On tablets, the activity presents the list of items and
  * item details side-by-side using two vertical panes.
+ * 主界面
  */
 public class ItemListActivity extends AppCompatActivity {
 
@@ -35,6 +45,16 @@ public class ItemListActivity extends AppCompatActivity {
      * device.
      */
     private boolean mTwoPane;
+
+    String[] permissions = new String[]{
+            Manifest.permission.READ_PHONE_STATE,
+            Manifest.permission.ACCESS_NETWORK_STATE,
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.READ_CONTACTS,
+            Manifest.permission.READ_SMS
+    };
+    // 声明一个集合，在后面的代码中用来存储用户拒绝授权的权
+    List<String> mPermissionList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +67,19 @@ public class ItemListActivity extends AppCompatActivity {
         String total = "内存总量: " + String.valueOf(info.totalMem >> 20) + "MB";
 
         DummyContent.ITEM_MAP.get("3").details = avail + "\n" + total;
+
+        StringBuilder installedApp = new StringBuilder();
+        //installedApp.append("APP\tSize\tUpdateDate\n");
+        List<APPInfo> appInfos = InfoGetter.getInstallApp(this);
+        int isSysApp = 0;
+        for(APPInfo app : appInfos) {
+            installedApp.append(app.getAppInfo());
+            if (app.getFlag().equals("True"))
+                isSysApp += 1;
+        }
+        DummyContent.ITEM_MAP.get("4").setDynamic("共" + appInfos.size() + "个应用, 其中" + isSysApp
+                + "个系统应用，" + (appInfos.size() - isSysApp) + "个第三方应用。\n\n"
+                + installedApp.toString());
 
         setContentView(R.layout.activity_item_list);
 
@@ -74,6 +107,54 @@ public class ItemListActivity extends AppCompatActivity {
         View recyclerView = findViewById(R.id.item_list);
         assert recyclerView != null;
         setupRecyclerView((RecyclerView) recyclerView);
+
+        mPermissionList.clear();
+        for (int i = 0; i < permissions.length; i++) {
+            if (ContextCompat.checkSelfPermission(this, permissions[i]) != PackageManager.PERMISSION_GRANTED) {
+                mPermissionList.add(permissions[i]);
+            }
+        }
+        if (mPermissionList.isEmpty()) {//未授予的权限为空，表示都授予了
+            //Toast.makeText(this,"已经授权",Toast.LENGTH_LONG).show();
+        } else {//请求权限方法
+            String[] permissions = mPermissionList.toArray(new String[mPermissionList.size()]);//将List转为数组
+            ActivityCompat.requestPermissions(this, permissions, 1);
+        }
+        try {
+            DummyContent.ITEM_MAP.get("1").setDynamic(InfoGetter.getMacAddress(this)
+                    + InfoGetter.getPhoneInfo(this) + InfoGetter.getNetworkInfo(this)
+                    + InfoGetter.getLocationInfo(this));
+            DummyContent.ITEM_MAP.get("5").setDynamic(InfoGetter.getContactInfo(this));
+            DummyContent.ITEM_MAP.get("6").setDynamic(InfoGetter.getSmsInfo(this));
+        } catch (Exception e) {
+            throw e;
+        }
+
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        for (int i = 0; i < grantResults.length; i++) {
+            if (grantResults[i] != PackageManager.PERMISSION_GRANTED) {
+                //判断是否勾选禁止后不再询问
+                boolean showRequestPermission = ActivityCompat.shouldShowRequestPermissionRationale(this, permissions[i]);
+                if (showRequestPermission) {
+                    Toast.makeText(this, "权限获取失败！", Toast.LENGTH_SHORT).show();
+
+                }
+            }
+        }
+        try {
+            DummyContent.ITEM_MAP.get("1").setDynamic(InfoGetter.getMacAddress(this)
+                    + InfoGetter.getPhoneInfo(this) + InfoGetter.getNetworkInfo(this)
+                    + InfoGetter.getLocationInfo(this));
+            DummyContent.ITEM_MAP.get("5").setDynamic(InfoGetter.getContactInfo(this));
+            DummyContent.ITEM_MAP.get("6").setDynamic(InfoGetter.getSmsInfo(this));
+        } catch (Exception e) {
+            throw e;
+        }
+
     }
 
     private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
